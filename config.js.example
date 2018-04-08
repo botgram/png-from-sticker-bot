@@ -8,3 +8,6 @@ exports.cache_db = __dirname + "/cache.db"
 
 // dwebp command or binary to use
 exports.dwebp = "dwebp"
+
+// maximum buffer size for converted output
+exports.maxBuffer = 10 * 1024 * 1024  // 10MB

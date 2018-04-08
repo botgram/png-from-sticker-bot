@@ -61,7 +61,7 @@ async function convertSticker(stickerFile, reply) {
 
     // convert webp to png
     const convertPromise = execFile(config.dwebp, [tmpFile.path, "-o", "-"],
-        { encoding: "buffer", maxBuffer: 10 * 1024 * 1024 }).catch((err) => {
+        { encoding: "buffer", maxBuffer: config.maxBuffer }).catch((err) => {
         throw Error("Conversion failed, code %s, signal %s, stderr %s",
             err.code, err.signal, util.inspect(err.stderr))
     })
