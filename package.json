@@ -1,0 +1,28 @@
+{
+  "name": "png-from-sticker-bot",
+  "version": "1.0.0",
+  "description": "Telegram bot that converts stickers to .png images",
+  "private": true,
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/botgram/png-from-sticker-bot.git"
+  },
+  "keywords": [
+    "telegram",
+    "bot",
+    "sticker",
+    "image"
+  ],
+  "author": "Alba Mendez <me@alba.sh>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/botgram/png-from-sticker-bot/issues"
+  },
+  "homepage": "https://github.com/botgram/png-from-sticker-bot",
+  "dependencies": {
+    "botgram": "^2.0.1"
+  }
+}
