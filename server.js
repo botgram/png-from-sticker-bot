@@ -1,8 +1,25 @@
 const tmp = require("tmp")
 const fs = require("fs")
-const { execFile } = require("child_process")
+const { execFile, execFileSync } = require("child_process")
 const botgram = require("botgram")
-const bot = botgram(process.argv[2])
+
+try {
+    config = require("./config.js")
+} catch (err) {
+    console.error("No valid config file found!", err)
+    process.exit(1)
+}
+
+try {
+    // Test command by getting version
+    const version = execFileSync(config.dwebp, ["-version"]).toString()
+    console.log("Using dwebp version: %s", version.trim())
+} catch (err) {
+    console.error("dwebp command not available!", err)
+    process.exit(1)
+}
+
+const bot = botgram(config.api_token)
 
 bot.sticker((msg, reply) => {
     // send "uploading photo to the user"
@@ -28,7 +45,7 @@ bot.sticker((msg, reply) => {
 
     function stickerWritten(path, cleanupCallback) {
         // convert webp to png
-        execFile("dwebp", [path, "-o", "-"],
+        execFile(config.dwebp, [path, "-o", "-"],
             { encoding: "buffer", maxBuffer: 10 * 1024 * 1024 },
             (err, stdout, stderr) => {
             if (err) {

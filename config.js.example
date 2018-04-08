@@ -1,0 +1,10 @@
+// Telegram API token here
+exports.api_token = "<API TOKEN>"
+
+// -----------------------
+
+// Location of the cache database
+exports.cache_db = __dirname + "/cache.db"
+
+// dwebp command or binary to use
+exports.dwebp = "dwebp"
