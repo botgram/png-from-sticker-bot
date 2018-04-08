@@ -136,3 +136,13 @@ bot.on("error", (err) => {
 bot.on("ready", (err) => {
     console.log("Bot is ready.")
 })
+
+// Handle regular exit nicely
+
+function handleExit(signal) {
+    bot.stop()
+    cache.close()
+}
+
+process.on('SIGINT', handleExit)
+process.on('SIGTERM', handleExit)
