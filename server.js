@@ -97,7 +97,7 @@ async function convertSticker(stickerFile, reply) {
     tmpFile.cleanup()
 
     // send as document
-    stdout.options = "sticker.png"
+    stdout.options = stickerFile.id.substring(0, 6) + ".png"
     reply.document(stdout)
     return await reply.then()
 }
