@@ -124,3 +124,9 @@ function registerConversion(id, promise) {
             throw error
         })
 }
+
+// Listen to error events
+
+bot.on("error", (err) => {
+    console.error("\nInternal error!\n%s\n", err.stack)
+})
