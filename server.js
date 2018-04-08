@@ -2,6 +2,7 @@ const util = require("util")
 const tmp = require("tmp-promise")
 const fs = require("fs")
 const { execFileSync } = require("child_process")
+const https = require("https")
 const botgram = require("botgram")
 const level = require("level")
 
@@ -30,7 +31,9 @@ try {
 
 const cache = level(config.cache_db)
 
-const bot = botgram(config.api_token)
+const bot = botgram(config.api_token, {
+    agent: new https.Agent({ keepAlive: true, maxFreeSockets: config.maxFreeSockets }),
+})
 
 bot.sticker(async (msg, reply) => {
     const stickerFile = msg.file
