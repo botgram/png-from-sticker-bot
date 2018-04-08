@@ -10,10 +10,11 @@ This is part of the [Botgram](https://botgram.js.org) project.
 
 ## Installing
 
-First make sure `webp` is installed and available:
+First make sure the `dwebp` command is available:
 
 ~~~ bash
 sudo apt install webp
+dwebp -version
 ~~~
 
 Then, clone this repo and install dependencies as usual:
@@ -27,10 +28,10 @@ Create the config file:
 
 ~~~ bash
 cp config.js.example config.js
-edit config.js  # Supply bot token
+edit config.js  # Set bot token
 ~~~
 
 Then, `npm start` or run the `server.js` script to start the bot.
 We recommend using PM2.
 
-*Make sure to delete the cache database file if you run this with another Telegram bot!*
+*Make sure to delete `cache.db` if you run this with another Telegram bot!*
