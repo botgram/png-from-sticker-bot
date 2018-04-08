@@ -130,3 +130,9 @@ function registerConversion(id, promise) {
 bot.on("error", (err) => {
     console.error("\nInternal error!\n%s\n", err.stack)
 })
+
+// Print message when bot is ready
+
+bot.on("ready", (err) => {
+    console.log("Bot is ready.")
+})
