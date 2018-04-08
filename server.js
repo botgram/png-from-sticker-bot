@@ -35,13 +35,20 @@ bot.sticker((msg, reply) => {
     reply.action("upload_photo")
 
     convertSticker(msg.file, reply).catch((err) => {
-        reply.text("Oops! I couldn't convert that sticker 😔")
+        reply.text(`
+Oops! I couldn't convert that sticker 😔
+Something unexpected happened, we'll look into it.
+        `)
         console.error("Error when converting sticker %s:\n%s", msg.file.id, err.stack)
     });
 })
 
 bot.command("start", "help", "usage", (msg, reply) => {
-    reply.text("Hi! Send me stickers and I'll convert them to 🖼 .png images, keeping the transparency.")
+    reply.text(`
+Hi! Send me stickers and I'll convert them to 🖼 .png images, keeping the transparency.
+
+📁 If you send me the same sticker twice, I'll just return a reference to the previous file. That way you won't have to download it again.
+    `)
 })
 
 // Base function to convert a sticker and upload the result to the user
