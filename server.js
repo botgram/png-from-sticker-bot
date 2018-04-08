@@ -6,11 +6,10 @@ const botgram = require("botgram")
 const level = require("level")
 
 const execFile = util.promisify(require("child_process").execFile)
-const fileStream = util.promisify(bot.fileStream.bind(bot))
-const pipe = (src, dest, options) => new Promise((resolve, reject) => {
+const pipe = (src, dest) => new Promise((resolve, reject) => {
     src.on("error", reject)
     dest.on("error", reject)
-    src.pipe(dest, options).on("finish", () => resolve())
+    src.pipe(dest).on("finish", () => resolve())
 })
 
 try {
@@ -102,6 +101,8 @@ async function convertSticker(stickerFile, reply) {
     reply.document(stdout)
     return await reply.then()
 }
+
+const fileStream = util.promisify(bot.fileStream.bind(bot))
 
 // Queue of ongoing conversions
 
