@@ -24,6 +24,7 @@
   "homepage": "https://github.com/botgram/png-from-sticker-bot",
   "dependencies": {
     "botgram": "^2.0.1",
+    "level": "^3.0.0",
     "tmp-promise": "^1.0.4"
   }
 }

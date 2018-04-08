@@ -3,6 +3,7 @@ const tmp = require("tmp-promise")
 const fs = require("fs")
 const { execFileSync } = require("child_process")
 const botgram = require("botgram")
+const level = require("level")
 
 const execFile = util.promisify(require("child_process").execFile)
 const fileStream = util.promisify(bot.fileStream.bind(bot))
@@ -28,19 +29,40 @@ try {
     process.exit(1)
 }
 
+const cache = level(config.cache_db)
+
 const bot = botgram(config.api_token)
 
-bot.sticker((msg, reply) => {
-    // send "uploading photo to the user"
-    reply.action("upload_photo")
+bot.sticker(async (msg, reply) => {
+    const stickerFile = msg.file
+    const id = stickerFile.id
 
-    convertSticker(msg.file, reply).catch((err) => {
+    try {
+        // try to send from cache
+        let pngId = await cache.get(id).catch(() => {})
+        if (pngId)
+            return await reply.document(pngId).then()
+
+        // send "uploading photo to the user"
+        reply.action("upload_photo")
+
+        // if there's an ongoing conversion, wait for it. otherwise, start one
+        if (Object.hasOwnProperty.call(ongoingConversions, id)) {
+            pngId = await ongoingConversions[id]
+            return await reply.document(pngId).then()
+        }
+
+        // start own conversion
+        const promise = convertSticker(stickerFile, reply)
+        registerConversion(id, promise)
+        return await promise
+    } catch (err) {
         reply.text(`
 Oops! I couldn't convert that sticker 😔
 Something unexpected happened, we'll look into it.
         `)
         console.error("Error when converting sticker %s:\n%s", msg.file.id, err.stack)
-    });
+    }
 })
 
 bot.command("start", "help", "usage", (msg, reply) => {
@@ -79,4 +101,22 @@ async function convertSticker(stickerFile, reply) {
     stdout.options = "sticker.png"
     reply.document(stdout)
     return await reply.then()
+}
+
+// Queue of ongoing conversions
+
+const ongoingConversions = {}
+
+function registerConversion(id, promise) {
+    ongoingConversions[id] = promise
+        .then((msg) => {
+            cache.put(id, msg.file.id, () => {})
+            return msg.file.id
+        }).then((result) => {
+            delete ongoingConversions[id]
+            return result
+        }, (error) => {
+            delete ongoingConversions[id]
+            throw error
+        })
 }
