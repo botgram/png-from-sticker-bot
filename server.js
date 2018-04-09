@@ -5,6 +5,7 @@ const { execFileSync } = require("child_process")
 const https = require("https")
 const botgram = require("botgram")
 const level = require("level")
+const crypto = require("crypto")
 
 const execFile = util.promisify(require("child_process").execFile)
 const pipe = (src, dest) => new Promise((resolve, reject) => {
@@ -40,8 +41,7 @@ bot.context()
 bot.message(apologizeIfQueued)
 
 bot.sticker(async (msg, reply) => {
-    const stickerFile = msg.file
-    const id = stickerFile.id
+    const id = generateId(msg)
 
     try {
         // try to send from cache
@@ -59,7 +59,7 @@ bot.sticker(async (msg, reply) => {
         }
 
         // start own conversion
-        const promise = convertSticker(stickerFile, reply)
+        const promise = convertSticker(id, msg, reply)
         registerConversion(id, promise)
         return await promise
     } catch (err) {
@@ -82,9 +82,9 @@ Hi! Send me stickers and I'll convert them to 🖼 .png images, keeping the tran
 // Base function to convert a sticker and upload the result to the user
 // Returns: Promise for the sent Message
 
-async function convertSticker(stickerFile, reply) {
+async function convertSticker(id, msg, reply) {
     // start sticker download
-    const streamPromise = fileStream(stickerFile)
+    const streamPromise = fileStream(msg.file)
 
     // create temporal file
     const tmpFilePromise = tmp.file({ postfix: ".webp" })
@@ -104,9 +104,18 @@ async function convertSticker(stickerFile, reply) {
     tmpFile.cleanup()
 
     // send as document
-    stdout.options = stickerFile.id.substring(0, 6) + ".png"
+    stdout.options = generateFileName(id, msg)
     reply.document(stdout)
     return await reply.then()
+}
+
+const generateId = (msg) =>
+    crypto.createHash("md5").update((msg.setName || "") + "\n" + msg.file.id).digest("hex")
+
+const generateFileName = (id, { setName }) => {
+    const bid = Buffer(id, "hex").toString("base64").replace("/", "_")
+    const name = setName ? (setName.replace(/[^a-zA-Z0-9_]+/g, "_") + "_" + bid.substring(0, 4)) : bid.substring(0, 7)
+    return name + ".png"
 }
 
 const fileStream = util.promisify(bot.fileStream.bind(bot))
