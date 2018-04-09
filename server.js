@@ -35,6 +35,10 @@ const bot = botgram(config.api_token, {
     agent: new https.Agent({ keepAlive: true, maxFreeSockets: config.maxFreeSockets }),
 })
 
+bot.context()
+
+bot.message(apologizeIfQueued)
+
 bot.sticker(async (msg, reply) => {
     const stickerFile = msg.file
     const id = stickerFile.id
@@ -136,6 +140,27 @@ bot.on("error", (err) => {
 bot.on("ready", (err) => {
     console.log("Bot is ready.")
 })
+
+// Middleware to apologize if there are queued messages
+
+function apologizeIfQueued(msg, reply, next) {
+    if (!msg.queued) return next()
+    const { context, chat } = msg
+
+    // If it's the first time we see this chat, decide if apology is needed
+    if (context.apologize === undefined) {
+        const downtime = Date.now() - msg.date.getTime()
+        context.apologize = (downtime > 60 * 1000)
+        if (context.apologize) {
+            reply.text("🤖 Sorry! I was having problems, but I'm back online now.")
+            console.error("Apologizing to %s %s (%s) for %ss downtime",
+                chat.type, chat.id, chat.name, Math.ceil(downtime/1000))
+        }
+    }
+
+    // If apology was not deemed necessary, process messages
+    if (!context.apologize) return next()
+}
 
 // Handle regular exit nicely
 
