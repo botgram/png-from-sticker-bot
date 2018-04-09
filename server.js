@@ -50,7 +50,7 @@ bot.sticker(async (msg, reply) => {
             return await reply.document(pngId).then()
 
         // send "uploading photo to the user"
-        reply.action("upload_photo")
+        reply.action("upload_document")
 
         // if there's an ongoing conversion, wait for it. otherwise, start one
         if (Object.hasOwnProperty.call(ongoingConversions, id)) {
@@ -72,10 +72,12 @@ Something unexpected happened, we'll look into it.
 })
 
 bot.command("start", "help", "usage", (msg, reply) => {
-    reply.text(`
-Hi! Send me stickers and I'll convert them to 🖼 .png images, keeping the transparency.
+    reply.markdown(`
+🖼 Send me stickers and I'll convert them to transparent .png images!
 
-📁 If you send me the same sticker twice, I'll just return a reference to the previous file. That way you won't have to download it again.
+💡 The image will be sent as a _file attachment_! If you're on Android, tap on the attachment and choose _Save to downloads_.
+
+📁 If you send me the same sticker twice, I'll just return a reference to the previous file. No need to download it again and no extra space used.
     `)
 })
 
@@ -136,6 +138,8 @@ function registerConversion(id, promise) {
             delete ongoingConversions[id]
             throw error
         })
+    // Add a rejection handler so Node does not complain
+    ongoingConversions[id].catch(() => {})
 }
 
 // Listen to error events
