@@ -81,6 +81,11 @@ bot.command("start", "help", "usage", (msg, reply) => {
     `)
 })
 
+bot.message((msg, reply, next) => {
+    if (msg.type !== "sticker" && msg.type !== "text")
+        reply.text("That was not a sticker... 🤔")
+})
+
 // Base function to convert a sticker and upload the result to the user
 // Returns: Promise for the sent Message
 
