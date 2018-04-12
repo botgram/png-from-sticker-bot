@@ -78,7 +78,22 @@ async function convertSticker(id, msg, reply) {
     const webpBuffer = await fileLoad(msg.file)
 
     // load image
-    const image = sharp(webpBuffer)
+    let image = sharp(webpBuffer)
+    const metadata = await image.metadata()
+
+    // extract raw pixels, replace transparent pixels
+    if (metadata.channels == 4) {
+        const raw = await image.raw().toBuffer()
+        const pixelCount = raw.length / 4
+        const fillColor = [ 35, 52, 70 ]
+        for (let i = 0; i < pixelCount; i++) {
+            if (raw[i*4 + 3] !== 0) continue
+            raw[i*4 + 0] = fillColor[0]
+            raw[i*4 + 1] = fillColor[1]
+            raw[i*4 + 2] = fillColor[2]
+        }
+        image = sharp(raw, { raw: metadata })
+    }
 
     // convert to PNG
     const pngBuffer = await image.png().toBuffer()
