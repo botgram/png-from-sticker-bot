@@ -26,5 +26,8 @@
     "botgram": "github:botgram/botgram#master",
     "level": "^3.0.0",
     "tmp-promise": "^1.0.4"
+  },
+  "devDependencies": {
+    "eslint": "^4.19.1"
   }
 }
