@@ -14,12 +14,14 @@ const pipe = (src, dest) => new Promise((resolve, reject) => {
     src.pipe(dest).on("finish", () => resolve())
 })
 
-try {
-    config = require("./config.js")
-} catch (err) {
-    console.error("No valid config file found!", err)
-    process.exit(1)
-}
+const config = (() => {
+    try {
+        return require("./config.js")
+    } catch (err) {
+        console.error("No valid config file found!", err)
+        process.exit(1)
+    }
+})()
 
 try {
     // Test command by getting version
@@ -81,7 +83,7 @@ bot.command("start", "help", "usage", (msg, reply) => {
     `)
 })
 
-bot.message((msg, reply, next) => {
+bot.message((msg, reply) => {
     if (msg.type !== "sticker" && msg.type !== "text")
         reply.text("That was not a sticker... 🤔")
 })
@@ -155,7 +157,7 @@ bot.on("error", (err) => {
 
 // Print message when bot is ready
 
-bot.on("ready", (err) => {
+bot.on("ready", () => {
     console.log("Bot is ready.")
 })
 
@@ -182,10 +184,10 @@ function apologizeIfQueued(msg, reply, next) {
 
 // Handle regular exit nicely
 
-function handleExit(signal) {
+function handleExit() {
     bot.stop()
     cache.close()
 }
 
-process.on('SIGINT', handleExit)
-process.on('SIGTERM', handleExit)
+process.on("SIGINT", handleExit)
+process.on("SIGTERM", handleExit)
