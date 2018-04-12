@@ -10,14 +10,7 @@ This is part of the [Botgram](https://botgram.js.org) project.
 
 ## Installing
 
-First make sure the `dwebp` command is available:
-
-~~~ bash
-sudo apt install webp
-dwebp -version
-~~~
-
-Then, clone this repo and install dependencies as usual:
+Clone this repo and install dependencies as usual:
 
 ~~~ bash
 git clone https://github.com/botgram/png-from-sticker-bot.git
