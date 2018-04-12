@@ -1,18 +1,9 @@
 const util = require("util")
-const tmp = require("tmp-promise")
-const fs = require("fs")
-const { execFileSync } = require("child_process")
 const https = require("https")
 const botgram = require("botgram")
 const level = require("level")
 const crypto = require("crypto")
-
-const execFile = util.promisify(require("child_process").execFile)
-const pipe = (src, dest) => new Promise((resolve, reject) => {
-    src.on("error", reject)
-    dest.on("error", reject)
-    src.pipe(dest).on("finish", () => resolve())
-})
+const sharp = require("sharp")
 
 const config = (() => {
     try {
@@ -22,15 +13,6 @@ const config = (() => {
         process.exit(1)
     }
 })()
-
-try {
-    // Test command by getting version
-    const version = execFileSync(config.dwebp, ["-version"]).toString()
-    console.log("Using dwebp version: %s", version.trim())
-} catch (err) {
-    console.error("dwebp command not available!", err)
-    process.exit(1)
-}
 
 const cache = level(config.cache_db)
 
@@ -92,29 +74,18 @@ bot.message((msg, reply) => {
 // Returns: Promise for the sent Message
 
 async function convertSticker(id, msg, reply) {
-    // start sticker download
-    const streamPromise = fileStream(msg.file)
+    // download sticker
+    const webpBuffer = await fileLoad(msg.file)
 
-    // create temporal file
-    const tmpFilePromise = tmp.file({ postfix: ".webp" })
+    // load image
+    const image = sharp(webpBuffer)
 
-    // wait until both are ready, and copy data from one into another
-    const [ stream, tmpFile ] = await Promise.all([ streamPromise, tmpFilePromise ])
-    const tmpStream = fs.createWriteStream(null, { fd: tmpFile.fd })
-    await pipe(stream, tmpStream)
-
-    // convert webp to png
-    const convertPromise = execFile(config.dwebp, [tmpFile.path, "-o", "-"],
-        { encoding: "buffer", maxBuffer: config.maxBuffer }).catch((err) => {
-        throw Error("Conversion failed, code %s, signal %s, stderr %s",
-            err.code, err.signal, util.inspect(err.stderr))
-    })
-    const { stdout } = await convertPromise
-    tmpFile.cleanup()
+    // convert to PNG
+    const pngBuffer = await image.png().toBuffer()
 
     // send as document
-    stdout.options = generateFileName(id, msg)
-    reply.document(stdout)
+    pngBuffer.options = generateFileName(id, msg)
+    reply.document(pngBuffer)
     return await reply.then()
 }
 
@@ -127,7 +98,7 @@ const generateFileName = (id, { setName }) => {
     return name + ".png"
 }
 
-const fileStream = util.promisify(bot.fileStream.bind(bot))
+const fileLoad = util.promisify(bot.fileLoad.bind(bot))
 
 // Queue of ongoing conversions
 
