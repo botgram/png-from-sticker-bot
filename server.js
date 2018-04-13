@@ -61,6 +61,8 @@ bot.command("start", "help", "usage", (msg, reply) => {
 
 💡 The image will be sent as a _file attachment_! If you're on Android, tap on the attachment and choose _Save to downloads_.
 
+‼️ Some apps, like Twitter for Android, don't handle transparent images correctly and you may see jagged edges or similar artifacts. Try using other apps instead.
+
 📁 If you send me the same sticker twice, I'll just return a reference to the previous file. No need to download it again and no extra space used.
     `)
 })
