@@ -25,6 +25,7 @@ bot.context()
 bot.message(apologizeIfQueued)
 
 bot.sticker(async (msg, reply) => {
+    // FIXME: limit conversions per user
     const id = generateId(msg)
 
     try {
