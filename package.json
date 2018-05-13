@@ -23,7 +23,7 @@
   },
   "homepage": "https://github.com/botgram/png-from-sticker-bot",
   "dependencies": {
-    "botgram": "github:botgram/botgram#master",
+    "botgram": "^2.1.0",
     "level": "^3.0.0",
     "sharp": "^0.20.1"
   },
