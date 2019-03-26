@@ -24,10 +24,10 @@
   "homepage": "https://github.com/botgram/png-from-sticker-bot",
   "dependencies": {
     "botgram": "^2.1.0",
-    "level": "^3.0.0",
+    "level": "^4.0.0",
     "sharp": "^0.20.1"
   },
   "devDependencies": {
-    "eslint": "^4.19.1"
+    "eslint": "^5.15.3"
   }
 }
